@@ -109,14 +109,7 @@ plt.savefig(os.path.join(script_dir, 'IOUT_vs_VOUT.jpg'), format='jpg')
 plt.show()
 
 
-
-
-
-
-
 #plotting the output impedance
-
-
 subprocess.run(command2, shell=True)
 
 file = os.path.join(script_dir, "bias_output_impedance_NMOS.csv")
