@@ -2,35 +2,153 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np  # Add import statement for NumPy
+import subprocess
+import time
 # Assuming this code is in a script file, get the directory of the script
-script_dir = os.path.dirname(__file__)
-file = os.path.join(script_dir, "bias_NMOS.csv")
+command1 = "scp -r vluz@193.136.221.60:/home/vluz/bias_current_NMOS.csv /home/vasco/Desktop/circuit_design_plot_scripts/single_ended_NMOS_OP_AMP"
+command2 = "scp -r vluz@193.136.221.60:/home/vluz/bias_output_impedance_NMOS.csv /home/vasco/Desktop/circuit_design_plot_scripts/single_ended_NMOS_OP_AMP"
 
+#inputs
+names = ["best corner","worst corner","nominal"] #the corners simulations
+current_val = 4.9 #desired current value in uA
+
+
+
+
+#code
+current_val = current_val/1000000
+subprocess.run(command1, shell=True)
+script_dir = os.path.dirname(__file__)
+file = os.path.join(script_dir, "bias_current_NMOS.csv")
 dataframe = pd.read_csv(file, skiprows=1)
+os.remove(file)
 dataframe = dataframe.apply(pd.to_numeric, errors='coerce')
 dataframe.dropna(inplace=True)
-
 # Extract the first column as x and the rest of the columns as y
 x = dataframe.iloc[:, 0]
 y = dataframe.iloc[:, 1:]
+interception = {}
+for col in y.columns:
+    for idx, value in enumerate(y[col]):
+        if value <= current_val:
+            interception[col] = x[idx]
+            break  # Exit the loop once the interception point is found
 
+
+
+
+
+# Define the corners simulations
+names = ["Best corner", "Worst corner", "Nominal"]
+
+# Generate a DataFrame from the interception dictionary
+interception_df = pd.DataFrame(interception.items(), columns=['Corner', 'Minimum VOUT'])
+
+# Reorder the DataFrame based on the specified order of names
+interception_df['Corner'] = pd.Categorical(interception_df['Corner'], categories=names, ordered=True)
+interception_df = interception_df.sort_values('Corner')
+
+# Replace the corner values with corresponding names
+interception_df['Corner'] = names
+
+
+plt.figure(figsize=(16, 12))
+table = plt.table(cellText=interception_df.values,
+                  colLabels=interception_df.columns,
+                  loc='center')
+
+# Adjust cell alignment to center
+for (i, j), cell in table.get_celld().items():
+    if (i == 0):
+        cell.set_text_props(fontweight='bold', horizontalalignment='center', verticalalignment='center')  # Bold font and center alignment for column labels
+        cell.set_fontsize(14)  # Adjust font size for column labels
+        cell.set_height(0.1)  # Adjust height for column labels
+        cell.set_facecolor('#f7f7f7')  # Light gray background for column labels
+        cell.set_edgecolor('black')  # Black edge for column labels
+        cell.set_linewidth(1.5)  # Line width for column labels
+    else:
+        cell.set_fontsize(12)  # Adjust font size for data cells
+        cell.set_height(0.1)  # Adjust height for data cells
+        cell.set_edgecolor('black')  # Black edge for data cells
+        cell.set_linewidth(1.5)  # Line width for data cells
+    if (i > 0 and j > 0):
+        cell.set_text_props(horizontalalignment='center', verticalalignment='center')  # Center alignment for data cells
+
+# Hide axes
+plt.axis('off')
+# Save the plot as a JPG image
+plt.savefig(os.path.join(script_dir,"interception_table.jpg"), bbox_inches='tight', pad_inches=0.05, format='jpg')
+plt.show()
+
+#plotting dc characteristic
+a = 0
 # Plotting only numeric columns
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(24, 12))
 for col in y.columns:
     if pd.api.types.is_numeric_dtype(y[col]):  # Check if column contains numeric data
-        plt.plot(x, y[col], label=col, linewidth=1.5)
+        plt.plot(x, y[col], label=names[a], linewidth=1.5)
+        a = a + 1
 
 plt.xlabel("VOUT (V)", fontsize=20, weight='bold')  # x-axis label with units
 plt.ylabel("IOUT (A)", fontsize=20, weight='bold')  # y-axis label with units
-plt.title('Data Plot')
+plt.title('IOUT vs VOUT')
 plt.legend()
 plt.grid(True, which='both', linestyle='--')  # Show both major and minor grid lines
 plt.minorticks_on()  # Enable minor ticks
 
 # Set y-axis tick locations based on the data range
-plt.yticks(np.linspace(y.min().min(), y.max().max(), num=10))
+plt.yticks(np.linspace(y.min().min(), y.max().max(), num=15))  # Adjust num for more ticks
+
+# Set x-axis tick locations based on the data range
+plt.xticks(np.linspace(x.min(), x.max(), num=15))  # Adjust num for more ticks
 
 for spine in plt.gca().spines.values():
     spine.set_linewidth(2)
 
+plt.savefig(os.path.join(script_dir, 'IOUT_vs_VOUT.jpg'), format='jpg')
+plt.show()
+
+
+
+
+
+
+
+#plotting the output impedance
+
+
+subprocess.run(command2, shell=True)
+
+file = os.path.join(script_dir, "bias_output_impedance_NMOS.csv")
+dataframe = pd.read_csv(file, skiprows=1)
+os.remove(file)
+dataframe = dataframe.apply(pd.to_numeric, errors='coerce')
+dataframe.dropna(inplace=True)
+# Extract the first column as x and the rest of the columns as y
+x = dataframe.iloc[:, 0]
+y = dataframe.iloc[:, [1, 3, 5]]
+a = 0
+plt.figure(figsize=(24, 12))
+for col in y.columns:
+    if pd.api.types.is_numeric_dtype(y[col]):  # Check if column contains numeric data
+        plt.plot(x, y[col], label=names[a], linewidth=1.5)
+        a = a + 1
+
+plt.xlabel("VOUT (V)", fontsize=20, weight='bold')  # x-axis label with units
+plt.ylabel("output impedance", fontsize=20, weight='bold')  # y-axis label with units
+plt.title('output impedance vs VOUT')
+plt.legend()
+plt.grid(True, which='both', linestyle='--')  # Show both major and minor grid lines
+plt.minorticks_on()  # Enable minor ticks
+
+# Set y-axis tick locations based on the data range
+plt.yticks(np.linspace(y.min().min(), y.max().max(), num=15))  # Adjust num for more ticks
+
+# Set x-axis tick locations based on the data range
+plt.xticks(np.linspace(x.min(), x.max(), num=15))  # Adjust num for more ticks
+
+for spine in plt.gca().spines.values():
+    spine.set_linewidth(2)
+
+plt.savefig(os.path.join(script_dir, 'output_impedance_vs_VOUT.jpg'), format='jpg')
 plt.show()
