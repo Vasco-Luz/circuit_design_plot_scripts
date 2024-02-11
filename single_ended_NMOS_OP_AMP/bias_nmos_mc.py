@@ -15,28 +15,40 @@ file = os.path.join(script_dir, "bias_current_NMOS_mc.csv")
 dataframe = pd.read_csv(file)
 os.remove(file)
 
+# Sample data
 nominal_values = dataframe.loc[3::4, "Nominal"].values
 std_deviation = np.std(nominal_values)
 average_value = np.mean(nominal_values)
+
+print(std_deviation)
 # Plot a graph with markers and improved line style
 plt.plot(nominal_values, linestyle='-', color='b', label="Nominal Values")
 plt.axhline(average_value, color='r', linestyle='--', label="Average Value")
+
 plt.xlabel("RUNS", fontsize=12, weight='bold')  # x-axis label with units
 plt.ylabel("IOUT (A)", fontsize=12, weight='bold')  # y-axis label with units
-
 plt.title('Nominal IBIAS runs')
 plt.legend()
+
+# Add legend with standard deviation
+legend_table = plt.table(cellText=[[f"Standard Deviation: {std_deviation}"]],
+                         loc='lower center',
+                         cellLoc='center',
+                         colWidths=[0.5],
+                         colLabels=[''])
+legend_table.auto_set_font_size(False)
+legend_table.set_fontsize(10)
+legend_table.scale(1, 1.5)
+
 plt.grid(True)  # Add grid lines for better readability
 plt.tight_layout()  # Adjust layout for better spacing
 for spine in plt.gca().spines.values():
     spine.set_linewidth(2)
 
+# Save and display the plot
+script_dir = os.path.dirname(__file__)
 plt.savefig(os.path.join(script_dir, 'Nominal_IBIAS_runs.jpg'), format='jpg')
 plt.show()
-
-print("Standard Deviation:", std_deviation)
-print("Average Value:", average_value)
-
 
 
 
