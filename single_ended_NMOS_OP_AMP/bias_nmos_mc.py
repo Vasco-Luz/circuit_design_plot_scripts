@@ -69,4 +69,5 @@ plt.tight_layout()
 for spine in plt.gca().spines.values():
     spine.set_linewidth(2)
 # Show plot
+plt.savefig(os.path.join(script_dir, 'Nominal_IBIAS_runs_histogram.jpg'), format='jpg')
 plt.show()
