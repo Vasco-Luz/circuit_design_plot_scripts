@@ -16,7 +16,7 @@ dataframe = pd.read_csv(file)
 os.remove(file)
 
 # Sample data
-nominal_values = dataframe.loc[3::4, "Nominal"].values
+nominal_values = dataframe.loc[1::2, "Nominal"].values
 std_deviation = np.std(nominal_values)
 average_value = np.mean(nominal_values)
 
@@ -48,12 +48,13 @@ for spine in plt.gca().spines.values():
 # Save and display the plot
 script_dir = os.path.dirname(__file__)
 plt.savefig(os.path.join(script_dir, 'Nominal_IBIAS_runs.jpg'), format='jpg')
-plt.show()
+#plt.show()
 
 
 
 
 # Create histogram plot
+plt.figure()
 plt.hist(nominal_values, bins=10, color='blue', edgecolor='black', density=True, label="Histogram")
 # Add x-axis label with units
 plt.xlabel("IOUT (A)", fontsize=12, weight='bold')
@@ -70,4 +71,4 @@ for spine in plt.gca().spines.values():
     spine.set_linewidth(2)
 # Show plot
 plt.savefig(os.path.join(script_dir, 'Nominal_IBIAS_runs_histogram.jpg'), format='jpg')
-plt.show()
+#plt.show()

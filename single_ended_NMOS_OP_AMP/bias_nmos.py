@@ -95,8 +95,8 @@ for col in y.columns:
         plt.plot(x, y[col], label=names[a], linewidth=1.5)
         a = a + 1
 
-plt.xlabel("VOUT (V)", fontsize=20, weight='bold')  # x-axis label with units
-plt.ylabel("IOUT (A)", fontsize=20, weight='bold')  # y-axis label with units
+plt.xlabel("VOUT (V)", fontsize=12, weight='bold')  # x-axis label with units
+plt.ylabel("IOUT (A)", fontsize=12, weight='bold')  # y-axis label with units
 plt.title('IOUT vs VOUT')
 plt.legend()
 plt.grid(True, which='both', linestyle='--')  # Show both major and minor grid lines
@@ -133,8 +133,8 @@ for col in y.columns:
         plt.plot(x, y[col], label=names[a], linewidth=1.5)
         a = a + 1
 
-plt.xlabel("VOUT (V)", fontsize=20, weight='bold')  # x-axis label with units
-plt.ylabel("output impedance", fontsize=20, weight='bold')  # y-axis label with units
+plt.xlabel("VOUT (V)", fontsize=12, weight='bold')  # x-axis label with units
+plt.ylabel("output impedance", fontsize=12, weight='bold')  # y-axis label with units
 plt.title('output impedance vs VOUT')
 plt.legend()
 plt.grid(True, which='both', linestyle='--')  # Show both major and minor grid lines
@@ -216,7 +216,3 @@ plt.savefig(os.path.join(script_dir,"ac_bias_table.jpg"), bbox_inches='tight', p
 
 
 
-
-
-with open(os.path.join(script_dir, "returned_values.txt"), "w") as f:
-        f.write(f"{current_vall}\n{Maximum_working_freq}")
