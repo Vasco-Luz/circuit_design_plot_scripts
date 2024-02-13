@@ -8,8 +8,25 @@ import time
 
 
 
+
+
+
+#inputs
+
+
+
+
+
+
+
+
+
+
+
 command1 = "scp -r vluz@193.136.221.60:/home/vluz/only_PMOS_LOAD_VDC_NMOS.csv /home/vasco/Desktop/circuit_design_plot_scripts/single_ended_NMOS_OP_AMP"
 command2 = "scp -r vluz@193.136.221.60:/home/vluz/only_PMOS_LOAD_VDC_NMOS_mc.csv /home/vasco/Desktop/circuit_design_plot_scripts/single_ended_NMOS_OP_AMP"
+command3 = "scp -r vluz@193.136.221.60:/home/vluz/only_PMOS_LOAD_current_characteristic.csv /home/vasco/Desktop/circuit_design_plot_scripts/single_ended_NMOS_OP_AMP"
+
 names = ["Nominal","ff_corner","ss_corner"] #the corners simulations
 
 subprocess.run(command1, shell=True)
@@ -18,7 +35,7 @@ script_dir = os.path.dirname(__file__)
 file = os.path.join(script_dir, "only_PMOS_LOAD_VDC_NMOS.csv")
 
 dataframe = pd.read_csv(file)
-#os.remove(file)
+os.remove(file)
 dataframe = dataframe.apply(pd.to_numeric, errors='coerce')
 dataframe.dropna(inplace=True)
 
@@ -169,4 +186,60 @@ for spine in plt.gca().spines.values():
     spine.set_linewidth(2)
 # Show plot
 plt.savefig(os.path.join(script_dir, 'VOUT_value_runs_histogram.jpg'), format='jpg')
+#plt.show()
+
+
+
+
+
+
+
+
+
+
+
+subprocess.run(command3, shell=True)
+
+script_dir = os.path.dirname(__file__)
+file = os.path.join(script_dir, "only_PMOS_LOAD_current_characteristic.csv")
+
+
+dataframe = pd.read_csv(file)
+os.remove(file)
+dataframe = dataframe.apply(pd.to_numeric, errors='coerce')
+dataframe.dropna(inplace=True)
+
+
+x = dataframe.iloc[:, 0]
+y = dataframe.iloc[:, [1, 3, 5]]
+names = ["Nominal","worst","best"] #the corners simulations
+
+
+
+
+a = 0
+# Plotting only numeric columns
+plt.figure()
+for col in y.columns:
+    if pd.api.types.is_numeric_dtype(y[col]):  # Check if column contains numeric data
+        plt.plot(x, y[col], label=names[a], linewidth=1.5)
+        a = a + 1
+
+plt.xlabel("Vx", fontsize=10, weight='bold')  # x-axis label with units
+plt.ylabel("Ibias", fontsize=10, weight='bold')  # y-axis label with units
+plt.title('Vout vs Ibias')
+plt.legend()
+plt.grid(True, which='both', linestyle='--')  # Show both major and minor grid lines
+plt.minorticks_on()  # Enable minor ticks
+
+# Set y-axis tick locations based on the data range
+plt.yticks(np.linspace(y.min().min(), y.max().max(), num=12))  # Adjust num for more ticks
+
+# Set x-axis tick locations based on the data range
+plt.xticks(np.linspace(x.min(), x.max(), num=11))  # Adjust num for more ticks
+
+for spine in plt.gca().spines.values():
+    spine.set_linewidth(2)
+
+plt.savefig(os.path.join(script_dir, 'only_PMOS_LOAD_current_characteristic.jpg'), format='jpg')
 #plt.show()

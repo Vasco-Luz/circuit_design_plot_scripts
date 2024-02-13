@@ -14,4 +14,6 @@ subprocess.run(['python3', os.path.join(script_dir,'bias_nmos_mc.py')])
 
 subprocess.run(['python3', os.path.join(script_dir,'PMOS_load_characterisation.py')])
 
-subprocess.run(['pdflatex', os.path.join(script_dir,'NMOS_opamp_cell_atuomatic_documentation.tex')])
+subprocess.run(['python3', os.path.join(script_dir,'iCMR_NMOS.py')])
+
+subprocess.run(['xelatex', os.path.join(script_dir,'NMOS_opamp_cell_atuomatic_documentation.tex')])
